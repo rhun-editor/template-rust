@@ -2,7 +2,7 @@
 
 ```toml
 [dependencies]
-rhun-ext = { git = "https://github.com/rhun-editor/extension-protocol", tag = "rust-v1.2.0" }
+rhun-ext = { git = "https://github.com/rhun-editor/extension-protocol", tag = "rust-v1.2.1" }
 ```
 
 No other dependencies are needed. Source and docs: `rust/rhun-ext` in

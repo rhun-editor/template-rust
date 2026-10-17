@@ -1,7 +1,7 @@
 # Go: rhunext
 
 ```go
-import "github.com/rhun-editor/extension-protocol/go/rhunext"   // v1.2.0 or later for every feature of section 12
+import "github.com/rhun-editor/extension-protocol/go/rhunext"   // v1.2.1 or later for every feature of section 12
 ```
 
 ```go
