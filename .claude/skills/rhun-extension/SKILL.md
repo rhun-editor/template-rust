@@ -1,6 +1,6 @@
 ---
 name: rhun-extension
-description: Build, test and release extensions for the rhun editor in Rust (preferred), Go, C or C++ - commands, edits, diagnostics, hover, settings, views that draw charts and pictures, completion lists and signature help. Use when asked to write, change, debug or publish a rhun extension, or when a repository has an extension.ini with protocol = 1.
+description: Build, test and release extensions for the rhun editor in Rust (preferred), Go, C or C++ - commands, edits, diagnostics, hover, settings, views that draw charts and pictures, completion, signature help, go to definition, references, symbols, code actions, rename and format. Use when asked to write, change, debug or publish a rhun extension, or when a repository has an extension.ini with protocol = 1.
 ---
 
 # Writing a rhun extension
@@ -26,7 +26,7 @@ before writing code, and the section of every feature you use.
 1. Copy the template (or `git clone` it), then rename: `name` and `owner` in `extension.ini` must
    equal the GitHub repository's owner and name; the binary is `bin/NAME-TARGET`.
 2. Write the manifest first (`reference/manifest.md`): commands, `[subscribe]` for the events
-   you need, `[needs]` for what you touch, `[provides]` for completion or signature help,
+   you need, `[needs]` for what you touch, `[provides]` for the language features you answer,
    `[settings]` for options the user sets. Ask only for what you use: the install dialog shows
    it.
 3. Write the handler with the SDK. Never write to standard output yourself: that is the
@@ -62,6 +62,12 @@ before writing code, and the section of every feature you use.
   shapes) and redraw only when something changed.
 - Completion answers are filtered and ranked by rhun as the user types: return every candidate
   for the word (up to 4096), not a pre-filtered top few; mark the list incomplete when you cut it.
+- Rename, format and code actions answer with a **workspace edit**: every group names the
+  version it was made for (`-` for a file that is not open), and rhun refuses the whole edit if
+  one document moved on, a range is outside its text or two edits overlap. Build the edits from
+  the text at the request's version, never from a later read.
+- Paths in locations and edits are absolute (or `#DOC` for an untitled document). Do not send
+  relative paths or `file://` URIs.
 
 ## Reference
 

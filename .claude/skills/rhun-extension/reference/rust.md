@@ -2,7 +2,7 @@
 
 ```toml
 [dependencies]
-rhun-ext = { git = "https://github.com/rhun-editor/extension-protocol", tag = "rust-v1.1.0" }
+rhun-ext = { git = "https://github.com/rhun-editor/extension-protocol", tag = "rust-v1.2.0" }
 ```
 
 No other dependencies are needed. Source and docs: `rust/rhun-ext` in
@@ -109,6 +109,45 @@ fn signature(&mut self, ext: &Ext, req: &SignatureRequest) -> Option<SignatureHe
 
 Manifest: `[provides] complete = *.rs` (and `complete.triggers`), `signature = *.rs`
 (`signature.triggers = ( ,`); `run(&[Feature::Complete, Feature::Signature], …)`.
+
+## Definition, references, symbols, code actions, rename, format
+
+```rust
+use rhun_ext::{
+    ActionsRequest, CodeAction, FormatRequest, Location, PosRequest, RenameRequest, Symbol, SymbolKind,
+    Target, TextEdit, WorkspaceEdit,
+};
+
+fn definition(&mut self, ext: &Ext, req: &PosRequest) -> Vec<Location> {
+    // one location opens at once; several make a list; none says "No definition found"
+    vec![Location::new(Target::Path("/abs/path/lib.rs".into()), range).text("pub fn add(a: i32, b: i32) -> i32 {")]
+}
+fn references(&mut self, ext: &Ext, req: &PosRequest) -> Vec<Location> { /* the same */ }
+fn symbols(&mut self, ext: &Ext, req: &PosRequest) -> Vec<Symbol> {
+    vec![Symbol::new(whole_fn, SymbolKind::Function, 0, "main").detail("fn()")]   // document order
+}
+fn actions(&mut self, ext: &Ext, req: &ActionsRequest) -> Vec<CodeAction> {
+    let fix = WorkspaceEdit::new().doc(req.doc, req.version, vec![TextEdit::new(req.range, "fixed")]);
+    vec![CodeAction::new("quickfix", "Fix it").edit(fix), CodeAction::new("source", "Organize imports").data(b"organize")]
+}
+fn action(&mut self, ext: &Ext, data: &[u8]) { /* the chosen action's data, after its edit */ }
+fn rename(&mut self, ext: &Ext, req: &RenameRequest) -> Result<WorkspaceEdit, String> {
+    // req.name is the new name; Err(text) is shown to the user
+    Ok(WorkspaceEdit::new()
+        .doc(req.doc, req.version, edits_here)
+        .file("/abs/path/other.rs", None, edits_there))   // None: a file that is not open, as on disk
+}
+fn format(&mut self, ext: &Ext, req: &FormatRequest) -> WorkspaceEdit {
+    // req.tab_width, req.spaces: the document's own settings
+    WorkspaceEdit::new().doc(req.doc, req.version, vec![TextEdit::new(rhun_ext::whole_range(&text), &formatted)])
+}
+```
+
+Manifest: `[provides] definition = *.rs`, `references`, `symbols`, `actions`, `rename`, `format`
+(each a list of patterns); `run(&[Feature::Definition, Feature::References, Feature::Symbols,
+Feature::Actions, Feature::Rename, Feature::Format], …)`. Keys: F12, shift+F12, ctrl+r, ctrl+.,
+F2 (on a word), shift+alt+f. Build edits against the request's version: a group whose version
+is not the open document's makes rhun refuse the whole edit.
 
 ## Release builds
 `cargo build --release` per target on its own runner (the template's workflow): Linux

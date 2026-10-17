@@ -1,7 +1,7 @@
 # Go: rhunext
 
 ```go
-import "github.com/rhun-editor/extension-protocol/go/rhunext"   // v1.1.0 or later for section 12
+import "github.com/rhun-editor/extension-protocol/go/rhunext"   // v1.2.0 or later for every feature of section 12
 ```
 
 ```go
@@ -28,6 +28,21 @@ Section 12 (`rhunext.RunWith([]string{rhunext.FeatureViews, rhunext.FeatureCompl
   `rhunext.CompletionItem{Range, Kind: rhunext.KindFunction, Label, Insert, Detail, Doc, Edits}`.
 - signature: implement `Signature(ext, req rhunext.Request) *rhunext.SignatureHelp`
   (`{Signature, ActiveFrom, ActiveTo, Doc}`; nil hides it).
+- definition, references (`FeatureDefinition`, `FeatureReferences`): implement
+  `Definition(ext, req rhunext.PosRequest) []rhunext.Location` and `References(…)`;
+  `rhunext.Location{Target: rhunext.Target{Path: abs}, Range, Text}` (`Target{Doc: id}` for an
+  untitled document).
+- symbols (`FeatureSymbols`): `Symbols(ext, req rhunext.PosRequest) []rhunext.Symbol` with
+  `rhunext.Symbol{Range, Kind: rhunext.SymbolFunction, Depth, Name, Detail}`, in document order.
+- code actions (`FeatureActions`): `Actions(ext, req rhunext.ActionsRequest) []rhunext.CodeAction`
+  (`{Kind: rhunext.ActionQuickFix, Title, Edit: &edit, Data}`) and `Action(ext, data []byte)`, the
+  chosen action's data after its edit.
+- rename (`FeatureRename`): `Rename(ext, req rhunext.RenameRequest) (rhunext.WorkspaceEdit, error)`;
+  an error is shown to the user. Format (`FeatureFormat`): `Format(ext, req rhunext.FormatRequest)
+  rhunext.WorkspaceEdit` (`req.TabWidth`, `req.Spaces`).
+- workspace edits: `var e rhunext.WorkspaceEdit; e.AddDoc(req.Doc, req.Version, edits...)`,
+  `e.AddFile(path, version or rhunext.OnDisk, edits...)` with `rhunext.TextEdit{Range, Text}`;
+  `ext.Apply(e)` applies one on your own (needs `documents = write`).
 
 Build each target with `CGO_ENABLED=0 GOOS=… GOARCH=… go build -trimpath -ldflags=-s` (the
 template's workflow).

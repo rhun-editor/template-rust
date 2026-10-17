@@ -57,6 +57,12 @@ complete = *.rs *.go
 complete.triggers = . :
 signature = *.rs
 signature.triggers = ( ,
+definition = *.rs
+references = *.rs
+symbols = *.rs
+actions = *.rs
+rename = *.rs
+format = *.rs
 
 # section 5: what it may touch; the install dialog shows it
 [needs]

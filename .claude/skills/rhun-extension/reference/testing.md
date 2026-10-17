@@ -4,9 +4,11 @@
 `go run github.com/rhun-editor/extension-protocol/conformance/ext@latest DIR` (or build it from a
 clone: `go build -o rhun-ext-check ./conformance/ext`), where `DIR` is the extension laid out as
 installed: `DIR/extension.ini`, `DIR/bin/NAME-TARGET`, the icon. It plays rhun: the handshake and
-features, every command on four documents, the edits stream, hover, completion and signature
-requests on a document your `[provides]` patterns match (answers checked against the grammar
-and the document), your views' events and every picture, an unknown event, an error reply,
+features, every command on four documents, the edits stream, hover, every language feature you
+agreed on a document your `[provides]` patterns match (completion, signature help, definition,
+references, symbols, code actions with the action event, rename and format: answers checked
+against the grammar and the document, workspace edits applied, `apply` served), your views'
+events and every picture, an unknown event, an error reply,
 fragmented and coalesced input, a burst of 2000 events, `bye` and the end of input. It prints
 `ok` or `FAIL name: why` per check and exits 1 on a failure. `-v` prints the whole exchange.
 
@@ -26,7 +28,11 @@ The script, one command per line (section 10 of the spec has them all):
   `click X Y`;
 - `print-doc` (the text, then `<eod>`), `print-state`, `print-toast`, `print-marks`,
   `print-hover`, `print-extensions`, `print-views` (`view=ID title=T shapes=N size=WxH
-  at=X,Y`), `print-complete` (the list and the signature help), `shot PATH` (a PPM picture).
+  at=X,Y`), `print-complete` (the list and the signature help), `print-palette` (a results
+  list: references, symbols, code actions, with `choose=` and the rows), `print-tabs`, `shot PATH`
+  (a PPM picture);
+- the language keys: `key F12`, `key shift+F12`, `key ctrl+r`, `key ctrl+.`, `key F2` (then
+  `type NAME`, `key Return`), `key shift+alt+f`.
 
 Compare the output with an expected file (`tests/basic.expected`); strip pids
 (`sed 's/pid=[1-9][0-9]*/pid=PID/'`).
