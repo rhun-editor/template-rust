@@ -1,0 +1,16 @@
+# Run with: rhun PROJECT --headless 1000x600 --extensions DIR --script tests/basic.txt
+# where DIR/rhun-editor/hello holds extension.ini and bin/ (tests/run.sh sets that up).
+# Every print-* line's output is compared by tests/run.sh with tests/basic.expected.
+wait 100
+print-extensions
+open proj/sample.txt
+cmd hello.say
+wait-ext hello running
+wait 300
+print-toast
+cmd hello.upper
+wait 400
+print-doc
+cmd undo
+print-doc
+print-extensions

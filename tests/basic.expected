@@ -1,0 +1,12 @@
+rhun-editor/hello state=idle pid=0 cmds=hello.say,hello.upper confined=0
+ext=hello state=running
+toast=Hello from an extension
+HELLO WORLD
+SECOND LINE
+
+<eod>
+hello world
+second line
+
+<eod>
+rhun-editor/hello state=running pid=PID cmds=hello.say,hello.upper confined=1

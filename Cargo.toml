@@ -1,0 +1,15 @@
+[package]
+name = "hello"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+publish = false
+
+[dependencies]
+rhun-ext = { git = "https://github.com/rhun-editor/extension-protocol", tag = "rust-v1.1.0" }
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true
+panic = "abort"

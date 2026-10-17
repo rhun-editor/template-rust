@@ -1,0 +1,116 @@
+# Rust: rhun-ext
+
+```toml
+[dependencies]
+rhun-ext = { git = "https://github.com/rhun-editor/extension-protocol", tag = "rust-v1.1.0" }
+```
+
+No other dependencies are needed. Source and docs: `rust/rhun-ext` in
+https://github.com/rhun-editor/extension-protocol (`cargo doc --open` in a clone).
+
+## Shape of an extension
+
+```rust
+use rhun_ext::{run, Doc, Event, Ext, Feature, Handler, Opened};
+
+#[derive(Default)]
+struct Mine { /* your state: documents seen, settings, views */ }
+
+impl Handler for Mine {
+    fn ready(&mut self, ext: &Ext, project: Option<&str>) {}
+    fn event(&mut self, ext: &Ext, ev: &Event) {
+        if let Some(o) = Opened::parse(ev) { /* o.doc, o.version, o.lang, o.path */ }
+    }
+    fn command(&mut self, ext: &Ext, name: &str, doc: Doc) {
+        // name is the manifest key ("say", not "hello.say"); doc is the active document or 0
+    }
+    fn setting(&mut self, ext: &Ext, key: &str, value: &str) {}
+}
+
+fn main() {
+    if let Err(e) = run(&[], Mine::default()) { eprintln!("mine: {e}"); }
+}
+```
+
+Handlers run one at a time on the main thread. Requests (`ext.toast`, `ext.text`, …) block until
+rhun answers; events that arrive meanwhile wait. `Ext` is `Clone + Send`: slow work goes on a
+thread of your own, which may call `ext` too.
+
+## Requests
+
+| Call | Does |
+| --- | --- |
+| `ext.text(doc)` | `(bytes, version)` |
+| `ext.range_text(doc, range)` | `(bytes, version)` |
+| `ext.replace(doc, version, range, text)` | one undo step; the new version (error `stale` when the version moved) |
+| `ext.insert(doc, version, text)` | at the cursor, replacing the selection |
+| `ext.select(doc, range)` | the cursor at the range's end |
+| `ext.open(path, Pos::new(line, col))` | a tab; its `Doc` |
+| `ext.diagnostics(doc, version, &[Diagnostic{range, severity, source, message}])` | replaces its marks |
+| `ext.hover(doc, at, text)` | the answer to a `hover` event |
+| `ext.toast(text)`, `ext.status(text)` | a message; the status bar text |
+| `ext.choose(prompt, &items)` → `Option<usize>`, `ext.ask(prompt)` → `Option<String>` | prompts (`None`: cancelled) |
+| `ext.register(name, keys, title)` | a command while running |
+| `ext.option(doc, "tab_width", "4")` | per-document options |
+| `ext.term(cmd)`, `ext.cmd(name)` | a suggested terminal command; one of rhun's own commands |
+| `ext.view(title)` → `View`, `ext.draw(view, &picture)`, `ext.unview(view)` | views (feature `Views`) |
+
+Helpers: `rhun_ext::whole_range(&text)`, `parse_edits(&body)` and `apply_edits(&mut text, &edits)`
+for the `edits` stream, `Settings` (`update`, `string`, `bool`, `int`).
+
+## A view with a chart (feature `Views`)
+
+```rust
+use rhun_ext::chart::{Chart, Series};
+use rhun_ext::{Metrics, View, ViewEvent};
+
+// run(&[Feature::Views], …); in command(): self.view = ext.view("Sizes").ok();
+fn view(&mut self, ext: &Ext, view: View, ev: ViewEvent) {
+    match ev {
+        ViewEvent::Size { width, height } => { self.size = (width, height); self.redraw(ext, view) }
+        ViewEvent::Metrics(m) => { self.metrics = m; self.redraw(ext, view) }
+        ViewEvent::Hover { x, y } => { self.chart.pointer = Some((x, y)); self.redraw(ext, view) }
+        ViewEvent::Leave => { self.chart.pointer = None; self.redraw(ext, view) }
+        ViewEvent::Click { x, y } => if let Some(hit) = self.drawn.hit(x, y) { /* hit.index */ },
+        ViewEvent::Closed => self.view = None,
+        _ => {}
+    }
+}
+fn redraw(&mut self, ext: &Ext, view: View) {
+    self.drawn = self.chart.draw(self.size.0, self.size.1, &self.metrics);
+    let _ = ext.draw(view, &self.drawn.picture);
+}
+// self.chart = Chart::bar("Lines by language", &["Rust", "Go"], vec![Series::new("lines", vec![1200.0, 800.0])]).unit(" lines");
+```
+
+`Chart::bar`, `Chart::line`, `Chart::pie`; `.unit()`, `.item()`; the hovered item gets a band and
+a tooltip. For your own drawing use `Picture` (`rect`, `rrect`, `line`, `poly`, `fill`, `circle`,
+`ring`, `pie`, `text`, `clip`, `unclip`) with `Color::Accent`, `Color::Series(n)`, `Color::Rgb`.
+Text width: `metrics.width(TextSize::Normal, "text")` (the interface font is monospaced).
+
+## Completion and signature help (features `Complete`, `Signature`)
+
+```rust
+use rhun_ext::{CompleteRequest, CompletionItem, CompletionList, Kind, SignatureHelp, SignatureRequest};
+use rhun_ext::complete::word_range;
+
+fn complete(&mut self, ext: &Ext, req: &CompleteRequest) -> CompletionList {
+    let Ok((text, _)) = ext.text(req.doc) else { return CompletionList::default() };
+    let line = String::from_utf8_lossy(&text).lines().nth(req.at.line as usize - 1).unwrap_or("").to_string();
+    let r = word_range(req.at.line, &line, req.at.col);
+    CompletionList::new(vec![
+        CompletionItem::new(r, Kind::Function, "println").insert("println!()").detail("macro").doc("Prints a line."),
+    ])
+}
+fn signature(&mut self, ext: &Ext, req: &SignatureRequest) -> Option<SignatureHelp> {
+    Some(SignatureHelp::new("fn add(a: i32, b: i32)").active_param("b: i32").doc("Adds."))
+}
+```
+
+Manifest: `[provides] complete = *.rs` (and `complete.triggers`), `signature = *.rs`
+(`signature.triggers = ( ,`); `run(&[Feature::Complete, Feature::Signature], …)`.
+
+## Release builds
+`cargo build --release` per target on its own runner (the template's workflow): Linux
+`x86_64-unknown-linux-musl` (static), macOS `aarch64-apple-darwin`, Windows
+`x86_64-pc-windows-msvc` with `-C target-feature=+crt-static`.
