@@ -1,7 +1,7 @@
 # Go: rhunext
 
 ```go
-import "github.com/rhun-editor/extension-protocol/go/rhunext"   // v1.2.1 or later for every feature of section 12
+import "github.com/rhun-editor/extension-protocol/go/rhunext"   // v1.3.0 or later for every feature of section 12
 ```
 
 ```go
@@ -25,7 +25,8 @@ Section 12 (`rhunext.RunWith([]string{rhunext.FeatureViews, rhunext.FeatureCompl
   `rhunext.Picture` has `Rect`, `RRect`, `Line`, `Poly`, `Fill`, `Circle`, `Ring`, `Pie`, `Text`,
   `Clip`, `Unclip` with `rhunext.ColorAccent`, `rhunext.Series(n)`, `rhunext.RGB(…)`.
 - completion: implement `Complete(ext, req rhunext.Request) rhunext.CompletionList` with
-  `rhunext.CompletionItem{Range, Kind: rhunext.KindFunction, Label, Insert, Detail, Doc, Edits}`.
+  `rhunext.CompletionItem{Range, Kind: rhunext.KindFunction, Label, Insert, Detail, Doc, Edits}`;
+  `.WithCursor(n)` puts the cursor n bytes into Insert (a snippet's `$0`).
 - signature: implement `Signature(ext, req rhunext.Request) *rhunext.SignatureHelp`
   (`{Signature, ActiveFrom, ActiveTo, Doc}`; nil hides it).
 - definition, references (`FeatureDefinition`, `FeatureReferences`): implement

@@ -42,7 +42,8 @@ Answer `ok ID LEN` + body, or `error ID CODE TEXT` (`unknown` for a verb you do 
 `refused TEXT` for a rename that cannot be done: rhun shows TEXT).
 - Completion body: `N MORE` LF, then per item `L1 C1 L2 C2 KIND LABEL_LEN INSERT_LEN DETAIL_LEN
   EXTRA_LEN` LF and the LABEL INSERT DETAIL EXTRA bytes back to back. EXTRA records: `edit L1 C1
-  L2 C2 LEN` LF + text (an import), `doc LEN` LF + documentation.
+  L2 C2 LEN` LF + text (an import), `doc LEN` LF + documentation, `cursor OFFSET 0` LF (the
+  cursor that far into INSERT; without it, after INSERT).
 - Signature body: `FROM TO` LF (the active parameter's bytes, `-1 -1` for none), the signature
   LF, documentation. An empty body hides the help.
 - Locations (definition, references): `N` LF, then per record `L1 C1 L2 C2 PATH_LEN TEXT_LEN` LF

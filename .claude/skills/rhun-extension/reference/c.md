@@ -36,7 +36,8 @@ Completion: in the `complete` handler, `rx_list l = {0};` (C++: `rx_list l{};`) 
 out)`, return 1 (no items is the empty list; returning 0 answers `unknown`). Give every candidate
 for the word: rhun filters and orders as the user types; set `l.more = 1` only when you cut the
 list. The range is usually `rx_word_start(text, len, req->at)` to `req->at`; `req->id` is what a
-`cancel` event names. Signature: `rx_signature_answer(out, sig, from, to, doc)`, return 1 (an
+`cancel` event names. `rx_list_item_cursor(&l, range, kind, label, insert, detail, doc, NULL,
+NULL, 0, cursor)` puts the cursor `cursor` bytes into `insert` (-1: after it). Signature: `rx_signature_answer(out, sig, from, to, doc)`, return 1 (an
 empty `out` hides the help).
 
 Definition, references, symbols, code actions, rename, format: the handler adds to the builder

@@ -6,7 +6,7 @@ license = "MIT"
 publish = false
 
 [dependencies]
-rhun-ext = { git = "https://github.com/rhun-editor/extension-protocol", tag = "rust-v1.2.1" }
+rhun-ext = { git = "https://github.com/rhun-editor/extension-protocol", tag = "rust-v1.3.0" }
 
 [profile.release]
 opt-level = "s"

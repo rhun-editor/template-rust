@@ -2,7 +2,7 @@
 
 ```toml
 [dependencies]
-rhun-ext = { git = "https://github.com/rhun-editor/extension-protocol", tag = "rust-v1.2.1" }
+rhun-ext = { git = "https://github.com/rhun-editor/extension-protocol", tag = "rust-v1.3.0" }
 ```
 
 No other dependencies are needed. Source and docs: `rust/rhun-ext` in
@@ -99,7 +99,8 @@ fn complete(&mut self, ext: &Ext, req: &CompleteRequest) -> CompletionList {
     let line = String::from_utf8_lossy(&text).lines().nth(req.at.line as usize - 1).unwrap_or("").to_string();
     let r = word_range(req.at.line, &line, req.at.col);
     CompletionList::new(vec![
-        CompletionItem::new(r, Kind::Function, "println").insert("println!()").detail("macro").doc("Prints a line."),
+        CompletionItem::new(r, Kind::Function, "println").insert("println!()").detail("macro").doc("Prints a line.")
+            .cursor(9), // the cursor between the parentheses (bytes into the inserted text)
     ])
 }
 fn signature(&mut self, ext: &Ext, req: &SignatureRequest) -> Option<SignatureHelp> {
