@@ -15,8 +15,16 @@ work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 dir=$work/exts/$owner/$name
 mkdir -p "$dir/bin" "$work/proj" "$work/config/rhun" "$work/state"
-cargo build --release --quiet
-cp "target/release/$name" "$dir/bin/$name-$target"
+if ! grep -q "^run\.$target *=" extension.ini && grep -q '^run\.wasm32-wasip1 *=' extension.ini; then
+    # no program for this system: the WebAssembly module, which rhun runs itself
+    module=$(sed -n 's/^run\.wasm32-wasip1 *= *//p' extension.ini | head -1)
+    cargo build --release --quiet --target wasm32-wasip1
+    mkdir -p "$dir/$(dirname "$module")"
+    cp "target/wasm32-wasip1/release/$name.wasm" "$dir/$module"
+else
+    cargo build --release --quiet
+    cp "target/release/$name" "$dir/bin/$name-$target"
+fi
 cp extension.ini "$dir/"
 printf 'hello world\nsecond line\n' > "$work/proj/sample.txt"
 printf '[files]\nrestore_session = false\nrestore_project = false\n[updates]\ncheck = false\n[git]\nenabled = false\n[ui]\nsidebar = false\nagents_panel = false\n' > "$work/config/rhun/config"

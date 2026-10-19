@@ -18,6 +18,8 @@ jobs:
           - { target: linux-x86_64, os: ubuntu-latest, rust: x86_64-unknown-linux-musl }
           - { target: macos-arm64, os: macos-latest, rust: aarch64-apple-darwin }
           - { target: windows-x64, os: windows-latest, rust: x86_64-pc-windows-msvc }
+          # the WebAssembly module, packed when the manifest names run.wasm32-wasip1
+          - { target: wasm32-wasip1, os: ubuntu-latest, rust: wasm32-wasip1 }
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -34,7 +36,11 @@ jobs:
           name=$(sed -n 's/^name *= *//p' extension.ini | head -1)
           exe=""; if [ "${{ matrix.target }}" = windows-x64 ]; then exe=.exe; fi
           mkdir -p out
-          cp "target/${{ matrix.rust }}/release/$name$exe" "out/$name-${{ matrix.target }}$exe"
+          if [ "${{ matrix.target }}" = wasm32-wasip1 ]; then
+            cp "target/wasm32-wasip1/release/$name.wasm" out/module.wasm
+          else
+            cp "target/${{ matrix.rust }}/release/$name$exe" "out/$name-${{ matrix.target }}$exe"
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: bin-${{ matrix.target }}
@@ -55,11 +61,17 @@ jobs:
           name=$(sed -n 's/^name *= *//p' extension.ini | head -1)
           icon=$(sed -n 's/^icon *= *//p' extension.ini | head -1)
           mkdir -p dist
+          # native binaries for the targets the manifest names; the module (run.wasm32-wasip1),
+          # when it names one, in every archive
+          module=$(sed -n 's/^run\.wasm32-wasip1 *= *//p' extension.ini | head -1)
           for t in linux-x86_64 macos-arm64 windows-x64; do
             stage=$(mktemp -d)
             mkdir -p "$stage/bin"
-            cp bins/bin-$t/* "$stage/bin/"
-            chmod +x "$stage/bin/"*
+            if grep -q "^run\.$t *=" extension.ini; then
+              cp bins/bin-$t/* "$stage/bin/"
+              chmod +x "$stage/bin/"*
+            fi
+            if [ -n "$module" ]; then mkdir -p "$stage/$(dirname "$module")"; cp bins/bin-wasm32-wasip1/module.wasm "$stage/$module"; fi
             cp extension.ini README.md LICENSE "$stage/"
             if [ -n "$icon" ]; then cp "$icon" "$stage/"; fi
             for d in themes syntax; do if [ -d "$d" ]; then cp -R "$d" "$stage/"; fi; done
