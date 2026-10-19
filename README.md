@@ -24,6 +24,24 @@ the `rhun` plugin from [rhun-editor/skills](https://github.com/rhun-editor/skill
 5. Tag `vX.Y.Z` (the manifest's `version`). The release workflow builds the three targets on
    their own runners and publishes what **Install from GitHub** takes.
 
+## Versions, development installs and the index
+
+- Each tag installs on its own: `OWNER/NAME@0.1.0` in **Install from GitHub** (or the link
+  `rhun://extension/OWNER/NAME@0.1.0`) installs that release; the name alone installs the latest
+  release's exact tag. rhun keeps the version an update replaces, so users can **Roll back**, and
+  a new version that fails its first start (no `hello` within 5 seconds) rolls back by itself.
+- While you work, the Extensions page's **Install** menu has **Link a Folder (development)**: rhun
+  runs the extension from your folder (build `bin/` first), so rebuild and **Restart** is the loop.
+  **From a Folder** and **From an Archive** install a copy or a release `.tar.gz` you built.
+- To be listed under **Browse**, and updated by itself on users' machines, open a pull request to
+  [rhun-editor/extensions](https://github.com/rhun-editor/extensions) adding `OWNER/NAME.ini` that
+  pins a release's tag and digests; its checks verify the digests and this workflow's attestation.
+  An update that asks for more access (`[needs]`) always asks users first.
+- A pack installs several extensions together: an extension without a program whose
+  `extension.ini` says `pack = OWNER/NAME …` (at most 16). Release it like any other, with
+  `NAME-TARGET.tar.gz` (its `extension.ini`, `README.md` and `LICENSE`) for each target and
+  `sha256sums.txt`.
+
 ## State and environment
 
 Your extension's folder is read-only once installed. Write to `$RHUN_STATE`, which is also its
