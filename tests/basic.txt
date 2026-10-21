@@ -3,6 +3,8 @@
 # Every print-* line's output is compared by tests/run.sh with tests/basic.expected.
 wait 100
 print-extensions
+# the [status] item shows before the program runs
+print-status
 open proj/sample.txt
 cmd hello.say
 wait-ext hello running
@@ -12,5 +14,28 @@ cmd hello.upper
 wait 400
 print-doc
 cmd undo
+print-doc
+# greet from the palette, then from its chord in [keys], which passes "world"
+cmd hello.greet
+wait 300
+print-toast
+key ctrl+k
+key ctrl+h
+wait 300
+print-toast
+# the editor's context menu has the [menu.editor] item for a .txt file
+click 500 200 right
+menu-pick Greet
+wait 300
+print-toast
+# a click on the status item (tests/run.sh puts its place here) runs greet with its arguments
+click STATUS
+wait 300
+print-toast
+# [language.Shell]: Enter on a comment line continues the comment
+open proj/notes.sh
+key End
+key Return
+type more
 print-doc
 print-extensions

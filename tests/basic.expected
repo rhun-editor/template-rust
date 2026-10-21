@@ -1,4 +1,5 @@
-rhun-editor/hello state=idle pid=0 cmds=hello.say,hello.upper confined=0
+rhun-editor/hello state=idle pid=0 cmds=hello.say,hello.upper,hello.greet confined=0
+side=left prio=0 owner=rhun-editor/hello item=hello text=$(play) Hello tooltip=Greet from the status bar command=greet shown=1 at=X,Y,W,H
 ext=hello state=running
 toast=Hello from an extension
 HELLO WORLD
@@ -9,4 +10,12 @@ hello world
 second line
 
 <eod>
-rhun-editor/hello state=running pid=PID cmds=hello.say,hello.upper confined=1
+toast=Hello, you (from palette)
+toast=Hello, world (from key)
+toast=Hello, the editor at line 3 (from menu)
+toast=Hello, the status bar (from ref)
+# a note
+# more
+
+<eod>
+rhun-editor/hello state=running pid=PID cmds=hello.say,hello.upper,hello.greet confined=1
