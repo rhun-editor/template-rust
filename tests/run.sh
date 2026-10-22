@@ -15,6 +15,7 @@ work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 dir=$work/exts/$owner/$name
 mkdir -p "$dir/bin" "$work/proj" "$work/config/rhun" "$work/state"
+sh tests/layout.sh "$dir"  # what the release ships: the manifest, the icon, themes/, icon-themes/, ...
 if ! grep -q "^run\.$target *=" extension.ini && grep -q '^run\.wasm32-wasip1 *=' extension.ini; then
     # no program for this system: the WebAssembly module, which rhun runs itself
     module=$(sed -n 's/^run\.wasm32-wasip1 *= *//p' extension.ini | head -1)
@@ -25,7 +26,6 @@ else
     cargo build --release --quiet
     cp "target/release/$name" "$dir/bin/$name-$target"
 fi
-cp extension.ini "$dir/"
 printf 'hello world\nsecond line\n' > "$work/proj/sample.txt"
 printf '# a note\n' > "$work/proj/notes.sh"
 printf '[files]\nrestore_session = false\nrestore_project = false\n[updates]\ncheck = false\n[git]\nenabled = false\n[ui]\nsidebar = false\nagents_panel = false\n[editor]\ncursor_blink = false\n' > "$work/config/rhun/config"

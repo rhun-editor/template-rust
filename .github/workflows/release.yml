@@ -52,29 +52,30 @@ jobs:
       - uses: actions/checkout@v4
       - name: The tag is the manifest's version
         run: test "${GITHUB_REF_NAME#v}" = "$(sed -n 's/^version *= *//p' extension.ini | head -1)"
+      # outside the checkout, which tests/layout.sh copies from
       - uses: actions/download-artifact@v4
         with:
-          path: bins
+          path: ${{ runner.temp }}/bins
       - name: Pack
         run: |
           set -e
           name=$(sed -n 's/^name *= *//p' extension.ini | head -1)
-          icon=$(sed -n 's/^icon *= *//p' extension.ini | head -1)
+          bins=$RUNNER_TEMP/bins
           mkdir -p dist
           # native binaries for the targets the manifest names; the module (run.wasm32-wasip1),
           # when it names one, in every archive
           module=$(sed -n 's/^run\.wasm32-wasip1 *= *//p' extension.ini | head -1)
           for t in linux-x86_64 macos-arm64 windows-x64; do
             stage=$(mktemp -d)
+            # the extension's files (tests/layout.sh: all but the source, tests and build files),
+            # then the program
+            sh tests/layout.sh "$stage"
             mkdir -p "$stage/bin"
             if grep -q "^run\.$t *=" extension.ini; then
-              cp bins/bin-$t/* "$stage/bin/"
+              cp "$bins/bin-$t/"* "$stage/bin/"
               chmod +x "$stage/bin/"*
             fi
-            if [ -n "$module" ]; then mkdir -p "$stage/$(dirname "$module")"; cp bins/bin-wasm32-wasip1/module.wasm "$stage/$module"; fi
-            cp extension.ini README.md LICENSE "$stage/"
-            if [ -n "$icon" ]; then cp "$icon" "$stage/"; fi
-            for d in themes syntax; do if [ -d "$d" ]; then cp -R "$d" "$stage/"; fi; done
+            if [ -n "$module" ]; then mkdir -p "$stage/$(dirname "$module")"; cp "$bins/bin-wasm32-wasip1/module.wasm" "$stage/$module"; fi
             tar -czf "dist/$name-$t.tar.gz" -C "$stage" .
           done
           (cd dist && sha256sum *.tar.gz > sha256sums.txt)

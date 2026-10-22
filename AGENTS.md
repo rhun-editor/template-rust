@@ -20,6 +20,7 @@ there is no in-process API. These are the instructions for a coding agent workin
 | `src/main.rs` | the `Handler`: `ready`, `event`, `invoke` (each run with `from` and its body; `command` without command-args), `command`, `setting`, `view`, `complete`, `signature`, `definition`, `references`, `symbols`, `actions`, `action`, `rename`, `format`, `bye` |
 | `tests/run.sh`, `tests/basic.txt`, `tests/basic.expected` | the headless test: rhun runs `basic.txt`, its output must equal `basic.expected` |
 | `tests/check.sh` | the conformance checker against the built extension |
+| `tests/layout.sh` | what ships: copies everything but the source, tests and build files into the extension folder (the tests and the release use it); a new source folder goes on its list |
 | `.github/workflows/ci.yml`, `release.yml` | tests on push; a `vX.Y.Z` tag publishes the release |
 
 ## Loop
