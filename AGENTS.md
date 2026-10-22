@@ -16,8 +16,8 @@ there is no in-process API. These are the instructions for a coding agent workin
 ## Layout
 | Path | What |
 | --- | --- |
-| `extension.ini` | the manifest: `name` and `owner` equal this repository's; commands, `[subscribe]`, `[provides]`, `[needs]`, `[settings]` |
-| `src/main.rs` | the `Handler`: `ready`, `event`, `command`, `setting`, `view`, `complete`, `signature`, `definition`, `references`, `symbols`, `actions`, `action`, `rename`, `format`, `bye` |
+| `extension.ini` | the manifest: `name` and `owner` equal this repository's; commands, `[keys]`, `[menu.LOCATION]`, `[status]`, `[language.NAME]`, `[subscribe]`, `[provides]`, `[needs]`, `[settings]` |
+| `src/main.rs` | the `Handler`: `ready`, `event`, `invoke` (each run with `from` and its body; `command` without command-args), `command`, `setting`, `view`, `complete`, `signature`, `definition`, `references`, `symbols`, `actions`, `action`, `rename`, `format`, `bye` |
 | `tests/run.sh`, `tests/basic.txt`, `tests/basic.expected` | the headless test: rhun runs `basic.txt`, its output must equal `basic.expected` |
 | `tests/check.sh` | the conformance checker against the built extension |
 | `.github/workflows/ci.yml`, `release.yml` | tests on push; a `vX.Y.Z` tag publishes the release |
@@ -37,7 +37,8 @@ there is no in-process API. These are the instructions for a coding agent workin
 - Positions are 1-based lines and 1-based **byte** columns. Ranges are half-open.
 - An edit names the version it was made for; `stale` means the user typed meanwhile: fetch the
   text again and retry once, never loop.
-- Commands in `extension.ini` and in `command()` must match (the palette shows the manifest's).
+- Commands in `extension.ini` and in `invoke` must match (the palette shows the manifest's); a
+  `[keys]`, `[menu.*]` or `[status]` entry names a command by its local name.
 - Ask only for the permissions you use (`[needs]`): the install dialog lists them in plain words.
 - Keep messages few: do not answer every keystroke with a request; redraw a view only when what
   it shows changed.

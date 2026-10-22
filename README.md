@@ -3,7 +3,7 @@
 A rhun extension is a program that [rhun](https://rhun.app) starts and talks to over its standard
 input and output, one text line per message. This repository is the smallest useful one, in
 Rust on [rhun-ext](https://github.com/rhun-editor/extension-protocol/tree/main/rust/rhun-ext):
-two commands, a toast and an edit, with the workflows that test it and release it for Linux,
+commands with a toast and an edit, a key, a menu item and a status item, with the workflows that test it and release it for Linux,
 macOS and Windows.
 
 Written for people and for coding agents: [AGENTS.md](AGENTS.md) is the working guide, and
@@ -16,13 +16,41 @@ the `rhun` plugin from [rhun-editor/skills](https://github.com/rhun-editor/skill
 2. In `extension.ini` set `name = NAME`, `owner = OWNER`, `title`, your commands and what the
    extension needs (`[needs]`); in `Cargo.toml` set `name = "NAME"`. rhun installs into
    `~/.config/rhun/extensions/OWNER/NAME/`.
-3. Change what `command` does in `src/main.rs`. Views (charts and pictures in a tab), completion
+3. Change what `invoke` does in `src/main.rs` (each run of a command, with where it came from
+   and what that place passes; below). Views (charts and pictures in a tab), completion
    lists and signature help are features: `run(&[Feature::Views], …)` and the matching
    `Handler` methods (section 12 of the [protocol](https://rhun.app/extensions/v1/)).
 4. Test: `cargo test`, `sh tests/run.sh` (drives rhun headlessly with `tests/basic.txt` and
    compares with `tests/basic.expected`) and `sh tests/check.sh` (the conformance checker).
 5. Tag `vX.Y.Z` (the manifest's `version`). The release workflow builds the three targets on
    their own runners and publishes what **Install from GitHub** takes.
+
+## Keys, menus, the status bar and language keys
+
+`extension.ini` declares more than commands (protocol 1.1, rhun 0.18):
+
+- `[keys]`: `ctrl+k ctrl+h = greet world when editorFocus` binds a chord to `greet` with the
+  argument `world`, only while text has the focus. One stroke or two; a bare letter needs a
+  `when` that keeps it away from typing.
+- `[menu.editor]` (also `explorer`, `tab`, `terminal`, `editor_title` and the views' menus):
+  `greet.when = resourceExt in '.txt .md'` shows **Greet** in the editor's context menu for those
+  files; `greet.args` is what the item passes.
+- `[status]`: `hello.text = $(play) Hello` puts an item in the status bar, whose click runs
+  `hello.command` with `hello.args`.
+- `[language.Shell]`: language keys for a grammar rhun has (`continue = #` continues a comment
+  on Enter; also brackets, auto-closing pairs, indentation rules, comments, folding markers).
+
+`invoke` in `src/main.rs` sees each run's `inv.from` (`palette`, `key`, `menu`, `ref`) and
+`inv.body`: the binding's arguments, a menu's target line and the item's arguments
+(`inv.target()`), a command reference's arguments. It needs `Feature::CommandArgs`, which `main`
+asks for. The Extensions page lists all of these under **Contributions**, with any line rhun
+dropped. `tests/basic.txt` runs `greet` from the palette, its chord, the menu and the status item.
+
+These come with rhun-ext 1.4.0. Until its tag is out, `Cargo.toml` builds against a checkout of
+[extension-protocol](https://github.com/rhun-editor/extension-protocol) next to this repository
+(`../extension-protocol`), and `tests/check.sh` runs that checkout's checker; CI checks it out
+there too. Once the tag is out, use the `git` dependency in the comment above it and run
+`cargo update -p rhun-ext`.
 
 ## Versions, development installs and the index
 

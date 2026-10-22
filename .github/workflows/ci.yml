@@ -15,12 +15,28 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      # until rhun-ext 1.4.0 is tagged, Cargo.toml builds against the SDK checked out next to this
+      - uses: actions/checkout@v4
+        with:
+          repository: rhun-editor/extension-protocol
+          path: .sdk
+      - name: The SDK next to this repository
+        shell: bash
+        run: mv .sdk ../extension-protocol
       - run: cargo clippy --locked --all-targets -- -D warnings
       - run: cargo test --locked
   extension:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # until rhun-ext 1.4.0 is tagged, Cargo.toml builds against the SDK checked out next to this
+      - uses: actions/checkout@v4
+        with:
+          repository: rhun-editor/extension-protocol
+          path: .sdk
+      - name: The SDK next to this repository
+        shell: bash
+        run: mv .sdk ../extension-protocol
       - uses: actions/setup-go@v5
         with:
           go-version: "1.25"
@@ -30,7 +46,7 @@ jobs:
         run: curl -fsSL https://github.com/vshvedov/rhun/releases/latest/download/install.sh | sh
       - name: Headless test
         run: |
-          # extensions came with rhun 0.18.0 (views, completion and signature help too)
+          # extensions came with rhun 0.18.0 (keys, menus and status items of extension.ini too)
           v=$("$HOME/.local/bin/rhun" --version | sed 's/^rhun //')
           case "$v" in 0.[0-9].*|0.1[0-7].*) echo "rhun $v has no extensions: the headless test needs 0.18.0"; exit 0 ;; esac
           sh tests/run.sh "$HOME/.local/bin/rhun"

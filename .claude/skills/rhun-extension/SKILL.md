@@ -75,3 +75,5 @@ before writing code, and the section of every feature you use.
 - `reference/protocol.md`: the messages in one page.
 - `reference/rust.md`, `reference/go.md`, `reference/c.md`: the SDKs, with recipes.
 - `reference/testing.md`: the checker, headless scripts, what each `print-` command shows.
+- `reference/contributions.md`: protocol 1.1 (rhun 0.18): menus, keys and chords, status items,
+  context keys and when clauses, commands with arguments, language keys, file icon themes.
