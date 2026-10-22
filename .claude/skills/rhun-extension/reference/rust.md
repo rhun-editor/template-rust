@@ -2,9 +2,11 @@
 
 ```toml
 [dependencies]
-rhun-ext = { git = "https://github.com/rhun-editor/extension-protocol", tag = "rust-v1.3.0" }
+rhun-ext = { git = "https://github.com/rhun-editor/extension-protocol", tag = "rust-v1.4.0" }
 ```
 
+Version 1.4.0 speaks protocol 1.1 (rhun 0.18). Until its tag is out, template-rust builds
+against a checkout next to the repository: `rhun-ext = { path = "../extension-protocol/rust/rhun-ext" }`.
 No other dependencies are needed. Source and docs: `rust/rhun-ext` in
 https://github.com/rhun-editor/extension-protocol (`cargo doc --open` in a clone).
 
@@ -31,6 +33,12 @@ fn main() {
     if let Err(e) = run(&[], Mine::default()) { eprintln!("mine: {e}"); }
 }
 ```
+
+With `Feature::CommandArgs` (template-rust asks for it) every run arrives at
+`fn invoke(&mut self, ext: &Ext, inv: &Invocation)` instead: `inv.name` (the manifest key),
+`inv.doc`, `inv.from` (`palette`, `key`, `menu`, `ref`), `inv.body`, and `inv.target()` for a menu
+item's target line and args (`contributions.md`). Without the feature agreed the default `invoke`
+calls `command`. `ext.has(Feature::X)` says whether rhun agreed a feature.
 
 Handlers run one at a time on the main thread. Requests (`ext.toast`, `ext.text`, …) block until
 rhun answers; events that arrive meanwhile wait. `Ext` is `Clone + Send`: slow work goes on a
@@ -149,6 +157,14 @@ Manifest: `[provides] definition = *.rs`, `references`, `symbols`, `actions`, `r
 Feature::Actions, Feature::Rename, Feature::Format], …)`. Keys: F12, shift+F12, ctrl+r, ctrl+.,
 F2 (on a word), shift+alt+f. Build edits against the request's version: a group whose version
 is not the open document's makes rhun refuse the whole edit.
+
+## Protocol 1.1
+
+Every 1.1 feature has a `Feature` variant, `Handler` methods for what rhun asks and `Ext` methods
+for requests; their names are on each feature's page (`features.md` is the index). Some types live
+in modules that are not re-exported at the crate root: `rhun_ext::tasks::…`, `rhun_ext::notebook::…`,
+`rhun_ext::custom_editor::…`, `rhun_ext::ai::…`, `rhun_ext::files::…`, `rhun_ext::auth::…`,
+`rhun_ext::when::check`.
 
 ## Release builds
 `cargo build --release` per target on its own runner (the template's workflow): Linux

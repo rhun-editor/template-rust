@@ -18,6 +18,12 @@ int main(void) {
 }
 ```
 
+Version 1.4.0 of the header speaks protocol 1.1 (rhun 0.18). `rx_run` sets standard input and
+output to binary mode on Windows. `rx_has(ext, "feature")` says whether rhun agreed a feature.
+With `"command-args"` in the features, set the `invoke` handler: every run arrives there with
+where it came from and its body (`rx_menu_target` reads a menu item's target; `contributions.md`).
+Each 1.1 feature's page names its handlers and `rx_` calls (`features.md` is the index).
+
 Handlers: `ready`, `command` (name without `NAME.`), `event` (every event, first), `view`,
 `complete`, `signature`, `bye`, `definition`, `references`, `symbols`, `actions`, `action`,
 `rename`, `format`; each gets the `user` pointer passed to `rx_run`.

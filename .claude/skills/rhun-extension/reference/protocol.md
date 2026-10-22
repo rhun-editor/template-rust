@@ -67,3 +67,14 @@ Y X Y X Y …` · `circle X Y R C` · `ring X Y R W C` · `pie X Y R FROM TO C` 
 top, clockwise) · `text X Y SIZE ALIGN C TEXT` (SIZE small normal large mono; ALIGN left center
 right; Y is the line's top) · `clip X Y W H` · `unclip`. Numbers: at most 7 digits before the
 point. Colors: `fg muted bg panel border accent error warning success`, `c1`-`c8`, `#rrggbb[aa]`.
+
+## Protocol 1.1 (rhun 0.18)
+v1's lines keep their meaning; 1.1 adds features named after `hello 1` (`features.md` lists
+them with their reference pages). rhun 0.18 sets `RHUN_PROTOCOL=1.1` and agrees only the names it
+knows, in `0 features` before `ready`; with `workspace-folders` a `0 folders LEN` event comes
+between them. Requests of a feature that was not agreed answer `error ID unknown`. New error
+codes: `io` (a workspace edit's write failed and was rolled back), `noterm`, `notask`; with
+`workspace-edits` a failed edit is `error ID CODE ENTRY TEXT` (ENTRY the 1-based entry at fault,
+or 0). Host requests now also carry bodies (`ID VERB … LEN` + bytes: `vkids`, `calls-in`,
+`tests-resolve`, …); the SDKs read them. With `command-args` every run is `0 run EXT.NAME DOC FROM
+LEN` + body. Commands are also named `OWNER/NAME.command`; `0 run` keeps `NAME.command`.
