@@ -158,6 +158,6 @@ native machine on Linux (no ptrace in Docker under Rosetta).
 - The approval comes after the resolve answer, showing the adapter command built from it
   (`${config:KEY}`): keep `program` free of user-controlled shell text.
 - `templates` files and adapters shipped in the extension's folder must be in the release
-  archive: the templates' release workflow packs `bin/`, the manifest, icon, README and LICENSE,
-  and of other folders only `themes/` and `syntax/`; add yours (`debug/`) to its `for d in` loop.
+  archive: the templates' `tests/layout.sh` (used by the release workflow) ships every top-level
+  folder except source, tests and build files, so `debug/` ships; keep it out of the exclusions.
 - In a remote window the adapter runs on the host; a `tcp` adapter listens on the host's loopback.

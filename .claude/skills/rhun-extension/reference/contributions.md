@@ -246,9 +246,9 @@ accent muted` draws the PNG's alpha as a mask), then `[files]` (whole name, any 
 `[extensions]` (longest suffix: `d.ts`), `[languages]`, `[folders]`, `[folders_open]`; keys
 `file`, `folder`, `folder_open` are the defaults. PNG 64 KB, 256 px (32 or 64 best); 512 icons,
 4096 lines; no SVG, no VS Code JSON. The id is `OWNER/NAME/THEME`; users pick it with **Select File
-Icon Theme** (`[ui] file_icons = OWNER/NAME/THEME`). Ship `icon-themes/`, `icons/` and `syntax/`
-in the release archive (the templates' release workflow copies only `themes` and `syntax`: add the
-others to its loop).
+Icon Theme** (`[ui] file_icons = OWNER/NAME/THEME`). `icon-themes/`, `icons/` and `syntax/` ship
+in the release archive by themselves: the templates' `tests/layout.sh` copies every top-level
+folder except source, tests and build files.
 
 ## Headless
 

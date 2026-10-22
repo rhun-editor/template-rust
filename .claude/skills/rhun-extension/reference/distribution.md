@@ -66,9 +66,13 @@ A tag `vVERSION` equal to the manifest's `version`. Assets, for each target the 
 icon, `themes/`, `syntax/`, `icon-themes/`, `icons/`, debugger templates, anything the manifest
 names; plain files only, no links) and `sha256sums.txt`. The templates' `release.yml` builds
 Linux x86-64 (Rust: musl, static), macOS arm64, Windows x64 (Rust: `+crt-static`) and the module
-when the manifest names one, attests the archives and publishes them. **It copies only `themes/`
-and `syntax/` besides the program, manifest, icon, README and LICENSE**: add any other folder
-your manifest refers to (`icon-themes`, `icons`, templates) to its `for d in themes syntax` loop.
+when the manifest names one, attests the archives and publishes them. The folder each archive
+holds is made by `tests/layout.sh DEST` (also used by `tests/run.sh` and `tests/check.sh`): every
+file and folder at the repository's top except source, tests and build files. It leaves out names
+starting with a dot, `tests`, `AGENTS.md`, `CLAUDE.md`, `bin` and `dist`, plus Go's `*.go`,
+`go.mod`, `go.sum`, `go.work*`, `internal`, `cmd`, `pkg`, or Rust's `target`, `out`, `src`,
+`build.rs`, `Cargo.*`, `rust-toolchain*`, `rustfmt.toml`, `clippy.toml`, `deny.toml`; the program
+is built into `DEST/bin`. It fails on a link. Add your own source folders to its exclusion list.
 
 Users install with **Install from GitHub** and `OWNER/NAME` (or `OWNER/NAME@0.1.0` for one tag;
 `rhun://extension/OWNER/NAME[@VERSION]` links do the same). rhun refuses archives over 64 MB,
@@ -118,7 +122,5 @@ latest/download/ASSET`) for install and update tests.
   bytes as they are); a hand-rolled C program or a script must do it itself (Python:
   `sys.stdout.buffer`).
 - A module that needs `run` or `network` cannot work as WebAssembly; ship native builds.
-- Data folders the release workflow does not copy are missing from the installed extension. The
-  templates' `tests/run.sh` and `tests/check.sh` copy only `extension.ini` and the program (and
-  the icon) into the test layout: copy your data folders there too, so the tests see what users
-  get.
+- A source or scratch folder at the repository's top that `tests/layout.sh` does not exclude
+  ships to every user; add it to the script's exclusion list. Links make the layout fail.

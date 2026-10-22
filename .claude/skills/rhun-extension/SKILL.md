@@ -83,8 +83,10 @@ are out, use the tag.
 7. **Release** (`reference/distribution.md`): set `version` (and `Cargo.toml`'s), commit, tag
    `vX.Y.Z`. The template's release workflow builds Linux x86-64, macOS arm64, Windows x64 (and
    the WebAssembly module when the manifest names one) and publishes `NAME-TARGET.tar.gz` and
-   `sha256sums.txt`; it copies only `themes/` and `syntax/` besides the program: add every other
-   folder the manifest names (`icon-themes/`, `icons/`, debugger templates). Users install with
+   `sha256sums.txt`. The archive is laid out by `tests/layout.sh`, which `tests/run.sh` and
+   `tests/check.sh` use too: it ships every file and folder of the repository except source,
+   tests and build files (and refuses links), so data folders ship by themselves; add your own
+   source folders to its exclusion list. Users install with
    **Install from GitHub** and `OWNER/NAME`; while developing, **Link a Folder (development)**
    runs it from the working folder. A pull request to `rhun-editor/extensions` lists it under
    Browse.
