@@ -40,7 +40,9 @@ status=$(run "$work/status.txt" | sed -n 's/^.*owner=rhun-editor\/hello .* at=\(
 set -- $status
 [ $# -eq 4 ] || { echo "FAIL basic: no status item"; exit 1; }
 sed -e "s|proj/|$work/proj/|" -e "s|^click STATUS|click $(($1 + $3 / 2)) $(($2 + $4 / 2))|" tests/basic.txt > "$work/basic.txt"
-run "$work/basic.txt" | sed -e 's/pid=[1-9][0-9]*/pid=PID/' -e 's/ at=[0-9,]*/ at=X,Y,W,H/' > "$work/out.txt"
+# confined=2 is a Linux without unprivileged user namespaces (GitHub's Ubuntu runners): Landlock
+# holds the files and TCP rules cut the network, so the extension is held all the same
+run "$work/basic.txt" | sed -e 's/pid=[1-9][0-9]*/pid=PID/' -e 's/ at=[0-9,]*/ at=X,Y,W,H/' -e 's/ confined=2/ confined=1/' > "$work/out.txt"
 [ -z "$UPDATE" ] || cp "$work/out.txt" tests/basic.expected  # UPDATE=1 writes the expected output
 if cmp -s "$work/out.txt" tests/basic.expected; then
     echo "ok   basic"
