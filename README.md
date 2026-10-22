@@ -46,11 +46,7 @@ the `rhun` plugin from [rhun-editor/skills](https://github.com/rhun-editor/skill
 asks for. The Extensions page lists all of these under **Contributions**, with any line rhun
 dropped. `tests/basic.txt` runs `greet` from the palette, its chord, the menu and the status item.
 
-These come with rhun-ext 1.4.0. Until its tag is out, `Cargo.toml` builds against a checkout of
-[extension-protocol](https://github.com/rhun-editor/extension-protocol) next to this repository
-(`../extension-protocol`), and `tests/check.sh` runs that checkout's checker; CI checks it out
-there too. Once the tag is out, use the `git` dependency in the comment above it and run
-`cargo update -p rhun-ext`.
+These come with rhun-ext 1.4.0, which `Cargo.toml` takes from its tag `rust-v1.4.0`.
 
 ## Versions, development installs and the index
 

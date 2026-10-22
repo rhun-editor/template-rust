@@ -15,28 +15,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      # until rhun-ext 1.4.0 is tagged, Cargo.toml builds against the SDK checked out next to this
-      - uses: actions/checkout@v4
-        with:
-          repository: rhun-editor/extension-protocol
-          path: .sdk
-      - name: The SDK next to this repository
-        shell: bash
-        run: mv .sdk ../extension-protocol
       - run: cargo clippy --locked --all-targets -- -D warnings
       - run: cargo test --locked
   extension:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      # until rhun-ext 1.4.0 is tagged, Cargo.toml builds against the SDK checked out next to this
-      - uses: actions/checkout@v4
-        with:
-          repository: rhun-editor/extension-protocol
-          path: .sdk
-      - name: The SDK next to this repository
-        shell: bash
-        run: mv .sdk ../extension-protocol
       - uses: actions/setup-go@v5
         with:
           go-version: "1.25"
