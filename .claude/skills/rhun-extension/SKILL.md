@@ -19,19 +19,17 @@ section of every feature you use; the reference pages here name them).
 
 - **Rust** (default): https://github.com/rhun-editor/template-rust, SDK `rhun-ext`
   (`reference/rust.md`): `rhun-ext = { git = "https://github.com/rhun-editor/extension-protocol",
-  tag = "rust-v1.4.0" }`. The richest SDK (charts included), small static binaries.
+  tag = "rust-v1.4.2" }`. The richest SDK (charts included), small static binaries.
 - **Go**: https://github.com/rhun-editor/template-go, SDK `rhunext` (`reference/go.md`):
-  `go get github.com/rhun-editor/extension-protocol@v1.4.0`. Go alone parses snippet templates and
+  `go get github.com/rhun-editor/extension-protocol@v1.4.2`. Go alone parses snippet templates and
   compiles regex transforms from source (`snippets.md`).
 - **C or C++**: one header, `c/rhunext.h` of the same repository (`reference/c.md`); examples
   `rhun-editor/wordfreq` (C, views) and `rhun-editor/words` (C++, completion).
 - Not TypeScript or Python for anything you ship: users would need a runtime installed. For one
   file that runs everywhere, build any of the three as WebAssembly (`distribution.md`).
 
-SDK v1.4.0 is the one that speaks protocol 1.1. Until its tags are published the templates build
-against a checkout of `rhun-editor/extension-protocol` next to the repository (template-rust's
-`Cargo.toml` path dependency; template-go's `tests/check.sh` with `RHUN_EXT_SDK=DIR`); once they
-are out, use the tag.
+SDK v1.4 speaks protocol 1.1: Rust `rhun-ext` from the tag `rust-v1.4.2`, Go
+`github.com/rhun-editor/extension-protocol@v1.4.2` (the templates pin them).
 
 ## The workflow
 
@@ -40,9 +38,15 @@ are out, use the tag.
    what you use: `[needs]` is shown in the install dialog, and every extra feature is more to
    test. Prefer a manifest-only contribution (`[keys]`, `[menu.*]`, `[status]`,
    `[language.NAME]`, icon themes) when it does the job.
-2. **Start from the template.** Copy (or `git clone`) template-rust or template-go, then rename:
-   `name` and `owner` in `extension.ini` equal the GitHub repository's owner and name; the binary
-   is `bin/NAME-TARGET` (also `Cargo.toml`'s `name`, or `main.go`'s comments). Keep its tests.
+2. **Start from the template.** With rhun 0.18.1 or later, `rhun new-extension DIR --name NAME
+   --owner OWNER --lang rust|go --skills --yes` downloads the template, renames it to
+   OWNER/NAME and copies this skill in for Claude Code (`.claude/skills`) and Codex
+   (`.agents/skills`); without flags in a terminal it asks, and the palette has **Extensions: New
+   Extension…**. With rhun 0.18.0, copy (or `git clone`) template-rust or template-go, then
+   rename: `name` and `owner` in `extension.ini` equal the GitHub repository's owner and name; the
+   binary is `bin/NAME-TARGET` (also `Cargo.toml`'s `name`, or `main.go`'s comments). Keep its
+   tests. Only themes, grammars, icon themes or language keys, and no commands? From 0.18.1 that is
+   a data extension: no `run`, `runtime`, `[commands]` or `[provides]`, and no program to build.
 3. **Declare every feature twice.** In `hello`: the SDK's run call takes them (Rust
    `run(&[Feature::CommandArgs, Feature::ViewTree], h)`, Go `rhunext.RunWith([]string{…}, h)`, C
    `rx_run("command-args view-tree", &h, NULL)`). In the manifest: the feature's `[provides]`
@@ -88,8 +92,12 @@ are out, use the tag.
    tests and build files (and refuses links), so data folders ship by themselves; add your own
    source folders to its exclusion list. Users install with
    **Install from GitHub** and `OWNER/NAME`; while developing, **Link a Folder (development)**
-   runs it from the working folder. A pull request to `rhun-editor/extensions` lists it under
-   Browse.
+   runs it from the working folder. To list it under Browse, run `rhun submit-extension` in the
+   repository after the release (rhun 0.18.1; palette **Extensions: Submit to Index…**): it writes
+   the index entry from the release's digests and opens the pull request to
+   `rhun-editor/extensions` (through `gh` when it is logged in, else GitHub's page in the browser).
+   The index checks that the release is attested by the repository's own `release.yml`, as the
+   templates' is.
 
 ## Rules that bite
 
@@ -150,3 +158,5 @@ are out, use the tag.
 - `reference/resources.md`: workspace watch, files, folders, scoped settings, secrets, URIs,
   URLs and sign-in, idle stop. `reference/distribution.md`: remote windows, WebAssembly, packs,
   releases, the index, updates, development installs.
+- Porting a VS Code extension: the vscode-to-rhun skill of the same plugin
+  (`../vscode-to-rhun/SKILL.md`).

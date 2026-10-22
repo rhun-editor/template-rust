@@ -1,7 +1,7 @@
 # Go: rhunext
 
 ```go
-import "github.com/rhun-editor/extension-protocol/go/rhunext"   // module v1.4.0: protocol 1.1 (rhun 0.18)
+import "github.com/rhun-editor/extension-protocol/go/rhunext"   // module v1.4.2: protocol 1.1 (rhun 0.18)
 ```
 
 ```go
@@ -14,7 +14,7 @@ func (m *mine) Event(ext *rhunext.Ext, ev rhunext.Event)               {}
 func main() { rhunext.Run(&mine{}) }                                    // or RunWith(features, h)
 ```
 
-`go get github.com/rhun-editor/extension-protocol@v1.4.0`. With
+`go get github.com/rhun-editor/extension-protocol@v1.4.2`. With
 `rhunext.RunWith([]string{rhunext.FeatureCommandArgs}, h)` (template-go does this) a handler that
 also implements `Invoke(ext *rhunext.Ext, inv rhunext.Invocation)` gets every run with
 `inv.Name()`, `inv.Doc`, `inv.From`, `inv.Body` and `inv.Target()` (`contributions.md`); `Run` stays

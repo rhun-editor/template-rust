@@ -51,13 +51,12 @@ has a variant.
 
 ## What the conformance checker agrees
 
-`rhun-ext-check` (v1.4.0) agrees and exercises: the v1 features, `commands`, `save-actions`, the
-snippet features, the source control features, `view-tree`, `view-log`, `view-keys`,
-`view-images`, `notify`, `progress`, the resources features except `workspace_watch`, the AI
-features, the editing features, `notebooks`, `custom-editors`, the language features above,
-`command-args`, `context-keys`, `status-items`, `tests`, `terminals`, `tasks` and `debug`. It does
-**not** agree `workspace_watch`, `view-form`, `view-table`, `view-doc`, `quick-input`,
-`markdown`, `decorations`, `diagnostic-tags` or the presentation providers: against the checker
-the extension runs as on a host without them (which it must survive). Test those headlessly
-against rhun (`testing.md`). Like rhun, it agrees `tasks` only together with `terminals` and
+`rhun-ext-check` 1.4.1 agrees every feature rhun 0.18 accepts in `hello`, and exercises the v1
+features, `commands`, `save-actions`, the snippet, source control, view, resources, AI, editing,
+notebook and custom-editor features, the language and presentation features, `command-args`,
+`context-keys`, `status-items`, `tests`, `terminals`, `tasks` and `debug`; it validates
+`watch-workspace`, `decorate`, `semantic-legend` and tagged diagnostics too. (1.4.0 did not agree
+`workspace_watch`, `view-form`, `view-table`, `view-doc`, `quick-input`, `markdown`,
+`decorations`, `diagnostic-tags` or the presentation providers.) Test what a feature draws
+headlessly against rhun (`testing.md`). Like rhun, it agrees `tasks` only together with `terminals` and
 `file-operations` only together with `workspace-edits`.

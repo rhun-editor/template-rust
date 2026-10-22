@@ -7,7 +7,7 @@ publish = false
 
 [dependencies]
 # Protocol 1.1 (keys, menus, status items, commands with arguments) comes with rhun-ext 1.4.0.
-rhun-ext = { git = "https://github.com/rhun-editor/extension-protocol", tag = "rust-v1.4.0" }
+rhun-ext = { git = "https://github.com/rhun-editor/extension-protocol", tag = "rust-v1.4.2" }
 
 [profile.release]
 opt-level = "s"

@@ -11,7 +11,8 @@ there is no in-process API. These are the instructions for a coding agent workin
   edits, 7 limits, 8 messages, 10 testing, 11 releases, 12 views, completion, signature help, definition, references, symbols, code
   actions, rename, format).
 - The SDK reference and recipes: `.claude/skills/rhun-extension/reference/rust.md` (the same
-  skill ships for Codex in the `rhun` plugin of rhun-editor/skills).
+  skill is in `.agents/skills/rhun-extension` for Codex, and in the `rhun` plugin of
+  rhun-editor/skills).
 
 ## Layout
 | Path | What |

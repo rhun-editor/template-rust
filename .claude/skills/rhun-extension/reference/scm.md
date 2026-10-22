@@ -196,6 +196,5 @@ without `git = read`.
   that holds them.
 - `scm-update` replaces the whole section; resend everything, not a delta.
 - Without `command-args` a button runs v1's `0 run EXT.NAME DOC` without its ARGS.
-- `rhun-ext-check` v1.4.0 does not know the `scm_title` location yet and fails a manifest with
-  `[menu.scm_title]` ("unknown menu location"); rhun 0.18 accepts it. Until the checker is fixed,
-  test such buttons headlessly and keep that one failure in mind.
+- `rhun-ext-check` 1.4.0 failed a manifest with `[menu.scm_title]` ("unknown menu location");
+  1.4.1 accepts it, as rhun 0.18 does.
